@@ -1,7 +1,4 @@
-CONFIG_FILE := ./makefile_config/default_aws.mk
-# CONFIG_FILE := ${CONFIG_FILE:-"./makefile_config/default_aws.mk"}
-include $(CONFIG_FILE)
-
+# global variables
 TOOL_DIR := ./hypershift
 HYPERSHIFT_CLI_TOOL := $(TOOL_DIR)/build_cli.sh
 HYPERSHIFT_S3_TOOL := $(TOOL_DIR)/create_s3.sh
@@ -9,21 +6,26 @@ HYPERSHIFT_INSTALL_TOOL := $(TOOL_DIR)/hypershift_install.sh
 HYPERSHIFT_CREATE_AWS_TOOL := $(TOOL_DIR)/hypershift_create_aws.sh
 HYPERSHIFT_CLEAN_S3_TOOL := $(TOOL_DIR)/clean_s3.sh
 
-ifeq ($(RELEASE_IMAGE),)
-RELEASE_IMAGE := $(shell oc get clusterversion -o jsonpath='{.items[0].status.desired.version}')
+# set default config to enable switch config
+DEFAULT_CONFIG_FILE := ./makefile_config/default_aws.mk
+CURRENT_CONFIG := ./.current_config
+CONFIG_FILE := $(shell if [ -s "$(CURRENT_CONFIG)" ]; then cat $(CURRENT_CONFIG); else echo $(DEFAULT_CONFIG_FILE); fi)
+include $(CONFIG_FILE)
+
+# export all the config as ENV for targets
+UNAME := $(shell uname)
+ifeq ($(UNAME), Darwin)
+SED := gsed
+else
+SED := sed
 endif
+export $($(SED) '/^[[:space:]]*$$/d; /^[[:space:]]*#/d; s/\s*=\s*/=/g' $(CONFIG_FILE))
 
 .PHONY: create
 create:
 	@$(MAKE) create-s3
 	@$(MAKE) hypershift-install
 	@$(MAKE) hypershft-create-aws
-
-.PHONY: switch-config
-switch-config:
-    @read -r -p "Enter config file name: " config; \
-    $(eval CONFIG_FILE := $$config); \
-    echo "Switched to config file $(CONFIG_FILE)"
 
 .PHONY: build-cli
 build-cli: $(HYPERSHIFT_CLI_TOOL)
@@ -53,7 +55,7 @@ hypershift-uninstall:
 	hypershift install  render --format=yaml | oc delete -f -
 
 .PHONY: hypershift-destroy-aws
-hypershift-uninstall:
+hypershift-destroy-aws:
 	hypershift destroy cluster aws \
       --aws-creds $(AWS_CREDS) \
       --name $(CLUSTER_NAME) \
@@ -72,3 +74,30 @@ clean:
 	@$(MAKE) hypershift-destroy-aws
 	@$(MAKE) hypershift-uninstall
 	@$(MAKE) delete-s3
+
+.PHONY: switch-config
+switch-config:
+	@read -p "Enter config file name: " config ; \
+	if [ ! -f "$$config" ]; then \
+		echo "Error: $$config does not exist" ; \
+		exit 1 ; \
+	fi ; \
+	echo "$$config" > $(CURRENT_CONFIG) ; \
+	echo "Switched to config file $$config" ;
+
+.PHONY: current-config
+current-config:
+	@echo "Current config file is $(CONFIG_FILE)" ; \
+	echo "Current ENV: " ; \
+	cat $(CONFIG_FILE) ; echo
+
+.PHONY: switch-config-dft
+switch-config-dft:
+	@echo "$(DEFAULT_CONFIG_FILE)" > $(CURRENT_CONFIG) ; \
+	echo "Switched to default config file $(DEFAULT_CONFIG_FILE)" ;
+
+HELI_AWS_CONFIG := ./makefile_config/heli_aws.mk
+.PHONY: switch-config-heli
+switch-config-heli:
+	@echo "$(HELI_AWS_CONFIG)" > $(CURRENT_CONFIG) ; \
+	echo "Switched to default config file $(HELI_AWS_CONFIG)"

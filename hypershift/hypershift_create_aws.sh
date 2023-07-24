@@ -1,4 +1,5 @@
 #!/bin/sh
+set -e
 
 CLUSTER_NAME=${CLUSTER_NAME:-"heli-test-$RANDOM"}
 PULL_SSECRET=${PULL_SSECRET:-"$HOME/pull-secret"}
@@ -8,6 +9,10 @@ HYPERSHIFT_AWS_REGION=${HYPERSHIFT_AWS_REGION:-"us-east-2"}
 NAMESPACE=${NAMESPACE:-"clusters"}
 AWS_EXTERNAL_DNS_DOMAIN=${AWS_EXTERNAL_DNS_DOMAIN:-"hypershift-ext.qe.devcluster.openshift.com"}
 AWS_BASE_DOMAIN=${AWS_BASE_DOMAIN:-"hypershift-ci.qe.devcluster.openshift.com"}
+
+if [ -z "${RELEASE_IMAGE}" ] && [ "${RELEASE_IMAGE_SYNC_MGMT}" == "true" ] ; then
+  RELEASE_IMAGE=$(oc get clusterversion version -ojsonpath={.status.desired.image})
+fi
 
 hypershift create cluster aws \
 --name=${CLUSTER_NAME} \

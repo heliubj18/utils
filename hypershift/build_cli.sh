@@ -7,9 +7,9 @@ function usage()
 {
   echo '
   # usage
-  # sh build_cli : build main branch latest hypershift cli
-  # sh build_cli branch release-4.13 : build release-4.13 branch latest hypershift cli
-  # sh build_cli pr 1234 : build hypershift cli based on hypershift project PR 1234
+  # sh build_cli : build main branch (if BRANCH env is not set) latest hypershift cli
+  # BRANCH=release-4.13 sh build_cli branch : build release-4.13 branch latest hypershift cli
+  # PR_NUMBER=1234 sh build_cli pr  : build hypershift cli based on hypershift project PR 1234
   '
 }
 
@@ -30,16 +30,16 @@ function build_hypershift_cli()
   pushd ${HYPERSHIFT_DIR}
   local current_branch=$(git rev-parse --abbrev-ref HEAD)
 
-  git checkout ${BRANCH}
-  if ! git diff --quiet HEAD origin/"${BRANCH}"; then
-    git pull origin ${BRANCH}
+  git checkout ${branch}
+  if ! git diff --quiet HEAD origin/"${branch}"; then
+    git pull origin ${branch}
   fi
 
   git -P log -1
 
   echo
   make hypershift
-  echo "Build hypershift client for branch ${BRANCH} successfully! You can find it in ${HYPERSHIFT_DIR}/bin"
+  echo "Build hypershift client for branch ${branch} successfully! You can find it in ${HYPERSHIFT_DIR}/bin"
   echo
   hypershift -v
   echo

@@ -20,17 +20,17 @@ function get_bucket_name()
 #global config
 BUCKET_REGION=${BUCKET_REGION:-"us-east-2"}
 BUCKET_NAME=${BUCKET_NAME:-`get_bucket_name`}
-TAG_NAME="hypershift-ci-makefile"
-TAG_VALUE="owned"
+TAG_NAME=${TAG_NAME:-"hypershift-ci-makefile-RANDOM"}
+TAG_VALUE=${TAG_VALUE:-"owned"}
 
-function cleanup() {
-  echo "Error occurs, cleaning up s3 bucket"
-  if aws s3api head-bucket --bucket "${BUCKET_NAME}" >/dev/null 2>&1; then
-      echo "Bucket ${BUCKET_NAME} exists, deleting..."
-      aws s3api delete-bucket --bucket "${BUCKET_NAME}"
-  fi
-}
-trap 'cleanup' ERR
+#function cleanup() {
+#  echo "Error occurs, cleaning up s3 bucket"
+#  if aws s3api head-bucket --bucket "${BUCKET_NAME}" >/dev/null 2>&1; then
+#      echo "Bucket ${BUCKET_NAME} exists, deleting..."
+#      aws s3api delete-bucket --bucket "${BUCKET_NAME}"
+#  fi
+#}
+#trap 'cleanup' ERR
 
 #check_s3_dependency
 echo "bucket name:" ${BUCKET_NAME} "region:" ${BUCKET_REGION}
@@ -39,7 +39,7 @@ if [[ ${BUCKET_REGION} == "us-east-1" ]] ; then
   aws s3api create-bucket --bucket ${BUCKET_REGION}
 else
   aws s3api create-bucket  --create-bucket-configuration \
-      LocationConstraint=$region --region=${BUCKET_REGION} --bucket ${BUCKET_NAME}
+      LocationConstraint=${BUCKET_REGION} --region=${BUCKET_REGION} --bucket ${BUCKET_NAME}
 fi
 
 aws s3api put-bucket-tagging --bucket ${BUCKET_NAME} --tagging 'TagSet=[{Key='"$TAG_NAME"',Value='"$TAG_VALUE"'}]'
@@ -57,6 +57,7 @@ pub_policy='{
     ]
 }'
 aws s3api put-bucket-policy --bucket ${BUCKET_NAME} --policy "$pub_policy"
+aws s3api head-bucket --bucket "${BUCKET_NAME}"
 
 
 

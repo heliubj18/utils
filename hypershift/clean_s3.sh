@@ -2,8 +2,8 @@
 set -e
 
 # delete s3 buckets by tags
-TAG_NAME="hypershift-ci-makefile"
-TAG_VALUE="owned"
+TAG_NAME=${TAG_NAME:-"hypershift-ci-makefile-RANDOM"}
+TAG_VALUE=${TAG_VALUE:-"owned"}
 query='{"Type":"TAG_FILTERS_1_0","Query":"{\"ResourceTypeFilters\":[\"AWS::S3::Bucket\"],\"TagFilters\":[{\"Key\":\"'"$TAG_NAME"'\",\"Values\":[\"'"$TAG_VALUE"'\"]}]}"}'
 buckets=$(aws resource-groups search-resources  --resource-query $query  --output json  | jq -r '.ResourceIdentifiers[].ResourceArn | split(":") | .[5]')
 echo "buckets: " $buckets

@@ -1,10 +1,14 @@
+# resource tags
+TAG_NAME = "hypershift-ci-makefile-heli"
+TAG_VALUE = "owned"
+
 # hypershift cli
 BRANCH := main
 # PR_NUMBER := 1234
 
 # bucket
-BUCKET_NAME := "heli-test"
-BUCKET_REGION := "us-east-2"
+BUCKET_NAME := heli-hypershift-demo-oidc
+BUCKET_REGION := us-east-2
 
 # hypershift install
 OCP_ARCH := "amd64"
@@ -22,6 +26,10 @@ HYPERSHIFT_AWS_REGION := "us-east-2"
 NAMESPACE := "clusters"
 AWS_EXTERNAL_DNS_DOMAIN := "hypershift-ext.qe.devcluster.openshift.com"
 AWS_BASE_DOMAIN := "hypershift-ci.qe.devcluster.openshift.com"
+
+# if RELEASE_IMAGE is not set, and RELEASE_IMAGE_SYNC_MGMT == true,
+# the hosted cluster payload will set with mgmt image
+RELEASE_IMAGE_SYNC_MGMT := "true"
 
 # RELEASE_IMAGE := "registry.ci.openshift.org/ocp/release:4.14.0-0.nightly-2023-07-18-085740"
 # INFRA_AVAILABILITY_POLICY := "HighlyAvailable"
