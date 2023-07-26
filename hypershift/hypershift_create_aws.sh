@@ -14,19 +14,46 @@ if [ -z "${RELEASE_IMAGE}" ] && [ "${RELEASE_IMAGE_SYNC_MGMT}" == "true" ] ; the
   RELEASE_IMAGE=$(oc get clusterversion version -ojsonpath={.status.desired.image})
 fi
 
-hypershift create cluster aws \
+create_cmd="hypershift create cluster aws \
 --name=${CLUSTER_NAME} \
---endpoint-access=${ENDPOINT_ACCESS} \
 --pull-secret=${PULL_SSECRET} \
 --aws-creds=${AWS_CREDS} \
 --node-pool-replicas=${NODEPOOL_REPLICAS} \
 --region=${HYPERSHIFT_AWS_REGION} \
---namespace=${NAMESPACE} \
 --base-domain=${AWS_BASE_DOMAIN} \
---external-dns-domain=${AWS_EXTERNAL_DNS_DOMAIN} \
---annotations=hypershift.openshift.io/cleanup-cloud-resources="true" \
---infra-availability-policy=${INFRA_AVAILABILITY_POLICY} \
---zones=${ZONES} \
---arch=${HYPERSHIFT_ARCH} \
---image-content-sources=${IMAGE_CONTENT_SOURCES} \
---release-image=${RELEASE_IMAGE}
+--annotations=hypershift.openshift.io/cleanup-cloud-resources=\"true\""
+
+if [[ -n ${NAMESPACE} ]] ; then
+  create_cmd=${create_cmd}" --namespace=${NAMESPACE}"
+fi
+
+if [[ -n ${ENDPOINT_ACCESS} ]] ; then
+  create_cmd=${create_cmd}" --endpoint-access=${ENDPOINT_ACCESS}"
+fi
+
+if [[ -n ${AWS_EXTERNAL_DNS_DOMAIN} ]] ; then
+  create_cmd=${create_cmd}" --external-dns-domain=${AWS_EXTERNAL_DNS_DOMAIN}"
+fi
+
+if [[ -n ${INFRA_AVAILABILITY_POLICY} ]] ; then
+  create_cmd=${create_cmd}" --infra-availability-policy=${INFRA_AVAILABILITY_POLICY}"
+fi
+
+if [[ -n ${ZONES} ]] ; then
+  create_cmd=${create_cmd}" --zones=${ZONES} "
+fi
+
+if [[ -n ${HYPERSHIFT_ARCH} ]] ; then
+  create_cmd=${create_cmd}" --arch=${HYPERSHIFT_ARCH}"
+fi
+
+if [[ -n ${RELEASE_IMAGE} ]] ; then
+  create_cmd=${create_cmd}" --release-image=${RELEASE_IMAGE}"
+fi
+
+if [[ -n ${IMAGE_CONTENT_SOURCES} ]] ; then
+  create_cmd=${create_cmd}" --image-content-sources=${IMAGE_CONTENT_SOURCES}"
+fi
+
+set -x
+${create_cmd}

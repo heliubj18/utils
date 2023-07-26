@@ -55,7 +55,7 @@ make build-cli
 ```
 * build a release-4.13 hypershift cli
 ```shell
-BRANCH=release-4.13 make update-cli 
+BRANCH=release-4.13 make build-cli 
 ```
 * build a hypershift cli based on PR 1234
 ```shell

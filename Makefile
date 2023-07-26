@@ -1,3 +1,11 @@
+# set default config to enable switch config
+DEFAULT_CONFIG_FILE := ./makefile_config/default_aws.mk
+CURRENT_CONFIG := ./.current_config
+CONFIG_FILE := $(shell if [ -s "$(CURRENT_CONFIG)" ]; then cat $(CURRENT_CONFIG); else echo $(DEFAULT_CONFIG_FILE); fi)
+include $(CONFIG_FILE)
+# export all env
+export
+
 # global variables
 TOOL_DIR := ./hypershift
 HYPERSHIFT_CLI_TOOL := $(TOOL_DIR)/build_cli.sh
@@ -5,34 +13,25 @@ HYPERSHIFT_S3_TOOL := $(TOOL_DIR)/create_s3.sh
 HYPERSHIFT_INSTALL_TOOL := $(TOOL_DIR)/hypershift_install.sh
 HYPERSHIFT_CREATE_AWS_TOOL := $(TOOL_DIR)/hypershift_create_aws.sh
 HYPERSHIFT_CLEAN_S3_TOOL := $(TOOL_DIR)/clean_s3.sh
+HYPERSHIFT_CREATE_HOSTED_KUBECONFIG_TOOL := $(TOOL_DIR)/create_hosted_kubeconfig.sh
+HYPERSHIFT_DEBUG_HC_TOOL := $(TOOL_DIR)/debug_hc.sh
 
-# set default config to enable switch config
-DEFAULT_CONFIG_FILE := ./makefile_config/default_aws.mk
-CURRENT_CONFIG := ./.current_config
-CONFIG_FILE := $(shell if [ -s "$(CURRENT_CONFIG)" ]; then cat $(CURRENT_CONFIG); else echo $(DEFAULT_CONFIG_FILE); fi)
-include $(CONFIG_FILE)
-
-# export all the config as ENV for targets
-UNAME := $(shell uname)
-ifeq ($(UNAME), Darwin)
-SED := gsed
-else
-SED := sed
-endif
-export $($(SED) '/^[[:space:]]*$$/d; /^[[:space:]]*#/d; s/\s*=\s*/=/g' $(CONFIG_FILE))
+.PHONY: test
+test:
+	sh $(TOOL_DIR)/test.sh
 
 .PHONY: create
 create:
 	@$(MAKE) create-s3
 	@$(MAKE) hypershift-install
-	@$(MAKE) hypershft-create-aws
+	@$(MAKE) hypershift-create-aws
 
 .PHONY: build-cli
 build-cli: $(HYPERSHIFT_CLI_TOOL)
 	sh $(HYPERSHIFT_CLI_TOOL) branch
 
-.PHONY: update-cli-pr
-update-cli-pr: $(HYPERSHIFT_CLI_TOOL)
+.PHONY: build-cli-pr
+build-cli-pr: $(HYPERSHIFT_CLI_TOOL)
 ifeq ($(strip $(PR_NUMBER)),)
 	$(error PR_NUMBER is not set)
 endif
@@ -48,7 +47,16 @@ hypershift-install: $(HYPERSHIFT_INSTALL_TOOL)
 
 .PHONY: hypershift-create-aws
 hypershift-create-aws: $(HYPERSHIFT_CREATE_AWS_TOOL)
+	@echo RELEASE_IMAGE_SYNC_MGMT $(RELEASE_IMAGE_SYNC_MGMT) ; \
 	sh $(HYPERSHIFT_CREATE_AWS_TOOL)
+
+.PHONY: hypershift-create-hosted-kubeconfig
+hypershift-create-hosted-kubeconfig: $(HYPERSHIFT_CREATE_HOSTED_KUBECONFIG_TOOL)
+	sh $(HYPERSHIFT_CREATE_HOSTED_KUBECONFIG_TOOL)
+
+.PHONY: hypeshift-debug
+hypershift-debug: $(HYPERSHIFT_DEBUG_HC_TOOL)
+	sh $(HYPERSHIFT_DEBUG_HC_TOOL)
 
 .PHONY: hypershift-uninstall
 hypershift-uninstall:
@@ -56,10 +64,15 @@ hypershift-uninstall:
 
 .PHONY: hypershift-destroy-aws
 hypershift-destroy-aws:
-	hypershift destroy cluster aws \
-      --aws-creds $(AWS_CREDS) \
-      --name $(CLUSTER_NAME) \
-      --region $(HYPERSHIFT_AWS_REGION)
+	@target_hc=`oc get hc -n $(NAMESPACE) $(CLUSTER_NAME) --ignore-not-found` ; \
+	if [ -n "$$target_hc" ] ; then \
+		hypershift destroy cluster aws \
+		  --aws-creds $(AWS_CREDS) \
+		  --name $(CLUSTER_NAME) \
+		  --region $(HYPERSHIFT_AWS_REGION) ; \
+	else \
+	  echo "hc not found, destroy successfully" ; \
+	fi
 
 .PHONY: delete-s3
 delete-s3:
