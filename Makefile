@@ -15,6 +15,7 @@ HYPERSHIFT_CREATE_AWS_TOOL := $(TOOL_DIR)/hypershift_create_aws.sh
 HYPERSHIFT_CLEAN_S3_TOOL := $(TOOL_DIR)/clean_s3.sh
 HYPERSHIFT_CREATE_HOSTED_KUBECONFIG_TOOL := $(TOOL_DIR)/create_hosted_kubeconfig.sh
 HYPERSHIFT_DEBUG_HC_TOOL := $(TOOL_DIR)/debug_hc.sh
+OUT_DIR := bin
 
 .PHONY: test
 test:
@@ -114,3 +115,9 @@ HELI_AWS_CONFIG := ./makefile_config/heli_aws.mk
 switch-config-heli:
 	@echo "$(HELI_AWS_CONFIG)" > $(CURRENT_CONFIG) ; \
 	echo "Switched to default config file $(HELI_AWS_CONFIG)"
+
+.PHONY: build-google-automation
+build-google-automation:
+	mkdir -p "${OUT_DIR}"
+	export GO111MODULE="on" && export GOFLAGS="" && go build  -ldflags="-s -w" -o "${OUT_DIR}" "./google/automation"
+
