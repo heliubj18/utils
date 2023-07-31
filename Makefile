@@ -124,4 +124,4 @@ build-google-automation:
 .PHONY: run-google-automation
 run-google-automation:
 	@$(MAKE) build-google-automation
-	GOOGLE_API_CREDENTIALS=$(HOME)/.google/credentials ./bin/automation
+	GOOGLE_API_CREDENTIALS=$(HOME)/.google/credentials GOOGLE_API_STATE_TOKEN=$(HOME)/.google/token.json ./bin/automation

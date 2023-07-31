@@ -51,7 +51,7 @@ func getClient(config *oauth2.Config) *http.Client {
 	// The file token.json stores the user's access and refresh tokens, and is
 	// created automatically when the authorization flow completes for the first
 	// time.
-	tokFile := "token.json"
+	tokFile := os.Getenv("GOOGLE_API_STATE_TOKEN")
 	tok, err := tokenFromFile(tokFile)
 	if err != nil {
 		tok = getTokenFromWeb(config)
@@ -187,7 +187,6 @@ func main() {
 	if len(resp.Values) == 0 {
 		fmt.Println("No data found.")
 	} else {
-		fmt.Printf("\n>>>>>>>> auto len %d\n", len(resp.Values))
 		for i := 0; i < len(resp.Values); i++ {
 			row := resp.Values[i]
 			if len(row) > 0 {
@@ -195,8 +194,6 @@ func main() {
 			}
 		}
 	}
-
-	fmt.Println("auto cases ", autoCases)
 
 	//find all existing cases
 	allCases := "User stories"
@@ -211,7 +208,6 @@ func main() {
 	separators := func(c rune) bool {
 		return c == ',' || c == ' '
 	}
-	fmt.Printf("\n>>>>>>>> all case len %d\n", len(resp.Values))
 	if len(resp.Values) == 0 {
 		fmt.Println("No data found.")
 	} else {
@@ -245,8 +241,6 @@ func main() {
 			}
 		}
 	}
-
-	fmt.Println("all cases ", allCasesMap)
 
 	//diff IDs
 	var diff AutoSheetList
