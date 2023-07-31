@@ -7,6 +7,8 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"sort"
+	"strings"
 
 	"golang.org/x/oauth2"
 	"golang.org/x/oauth2/google"
@@ -17,6 +19,32 @@ import (
 const (
 	HOUserStorySheetID = "1uy_J6lUcp_BnhCWOBqo9C5U6gyG6HcFhuftIKgiaLQY"
 )
+
+type AutoSheet struct {
+	ID       string
+	Title    string
+	Platform string
+	Type     string
+	Version  string
+	Owner    string
+	Status   string
+	Comment  string
+	BugLink  string
+}
+
+type AutoSheetList []AutoSheet
+
+func (as AutoSheetList) Len() int {
+	return len(as)
+}
+
+func (as AutoSheetList) Less(i, j int) bool {
+	return as[i].ID < as[j].ID
+}
+
+func (as AutoSheetList) Swap(i, j int) {
+	as[i], as[j] = as[j], as[i]
+}
 
 // Retrieve a token, saves the token, then returns the generated client.
 func getClient(config *oauth2.Config) *http.Client {
@@ -73,6 +101,54 @@ func saveToken(path string, token *oauth2.Token) {
 	json.NewEncoder(f).Encode(token)
 }
 
+func appendDataToSheet(srv *sheetsv4.Service, spreadsheetId, appendRange string, data [][]interface{}) error {
+	valueRange := &sheetsv4.ValueRange{
+		Values: data,
+	}
+	_, err := srv.Spreadsheets.Values.Append(spreadsheetId, appendRange, valueRange).ValueInputOption("USER_ENTERED").Do()
+	if err != nil {
+		return fmt.Errorf("failed to append data to sheet: %v", err)
+	}
+
+	fmt.Println("Data has been appended to sheet")
+	return nil
+}
+
+func getPlatformByTitle(title string) string {
+	if title == "" {
+		return ""
+	}
+
+	if strings.Contains(strings.ToLower(title), "azure") {
+		return "Azure"
+	}
+
+	return "AWS"
+}
+
+func getAutoTypeByTitle(title string) string {
+	if title == "" {
+		return ""
+	}
+
+	t := strings.ToLower(title)
+	if strings.Contains(t, "install") ||
+		strings.Contains(t, "create") ||
+		strings.Contains(t, "delete") ||
+		strings.Contains(t, "destroy") ||
+		strings.Contains(t, "remove") ||
+		strings.Contains(t, "stuck") ||
+		strings.Contains(t, "clear") ||
+		strings.Contains(t, "private") ||
+		strings.Contains(t, "endpoint") ||
+		strings.Contains(t, "proxy") {
+		return "Install"
+	}
+
+	return "Function"
+
+}
+
 func main() {
 	creds := os.Getenv("GOOGLE_API_CREDENTIALS")
 	_, err := os.Stat(creds)
@@ -98,22 +174,115 @@ func main() {
 		log.Fatalf("Unable to retrieve Sheets client: %v", err)
 	}
 
-	// Prints the names and majors of students in a sample spreadsheet:
-	// https://docs.google.com/spreadsheets/d/1BxiMVs0XRA5nFMdKvBdBZjgmUUqptlbs74OgvE2upms/edit
-	spreadsheetId := "1BxiMVs0XRA5nFMdKvBdBZjgmUUqptlbs74OgvE2upms"
-	readRange := "Class Data!A2:E"
-	resp, err := srv.Spreadsheets.Values.Get(spreadsheetId, readRange).Do()
+	spreadsheetId := HOUserStorySheetID
+	autoSheetName := "Automation"
+	autoReadRange := autoSheetName + "!A2:G"
+	resp, err := srv.Spreadsheets.Values.Get(spreadsheetId, autoReadRange).Do()
 	if err != nil {
 		log.Fatalf("Unable to retrieve data from sheet: %v", err)
 	}
 
+	//find existing auto case IDs
+	autoCases := make(map[string]struct{}, 100)
 	if len(resp.Values) == 0 {
 		fmt.Println("No data found.")
 	} else {
-		fmt.Println("Name, Major:")
-		for _, row := range resp.Values {
-			// Print columns A and E, which correspond to indices 0 and 4.
-			fmt.Printf("%s, %s\n", row[0], row[4])
+		fmt.Printf("\n>>>>>>>> auto len %d\n", len(resp.Values))
+		for i := 0; i < len(resp.Values); i++ {
+			row := resp.Values[i]
+			if len(row) > 0 {
+				autoCases[strings.Trim(row[0].(string), " ")] = struct{}{}
+			}
 		}
 	}
+
+	fmt.Println("auto cases ", autoCases)
+
+	//find all existing cases
+	allCases := "User stories"
+	allCaseReadRange := allCases + "!B4:H"
+	resp, err = srv.Spreadsheets.Values.Get(spreadsheetId, allCaseReadRange).Do()
+	if err != nil {
+		log.Fatalf("Unable to retrieve data from sheet %s: %v", allCases, err)
+	}
+
+	//find all case IDs
+	allCasesMap := make(map[string]AutoSheet, 50)
+	separators := func(c rune) bool {
+		return c == ',' || c == ' '
+	}
+	fmt.Printf("\n>>>>>>>> all case len %d\n", len(resp.Values))
+	if len(resp.Values) == 0 {
+		fmt.Println("No data found.")
+	} else {
+		for i := 0; i < len(resp.Values); i++ {
+			row := resp.Values[i]
+			if len(row) > 6 {
+				caseID := strings.Trim(row[6].(string), " ")
+				if strings.HasPrefix(caseID, "OCP-") {
+					record := AutoSheet{
+						Title:    row[1].(string),
+						Status:   "ToDo",
+						Platform: getPlatformByTitle(row[1].(string)),
+						Type:     getAutoTypeByTitle(row[1].(string)),
+					}
+
+					if v := strings.Split(row[2].(string), " "); len(v) > 0 {
+						record.Version = strings.Trim(strings.TrimSpace(v[len(v)-1]), ",")
+					}
+
+					jiraID := row[0].(string)
+					if jiraID != "" && strings.HasPrefix(jiraID, "OCPBUGS-") {
+						record.Comment = jiraID
+					}
+
+					ids := strings.FieldsFunc(caseID, separators)
+					for _, id := range ids {
+						record.ID = id
+						allCasesMap[id] = record
+					}
+				}
+			}
+		}
+	}
+
+	fmt.Println("all cases ", allCasesMap)
+
+	//diff IDs
+	var diff AutoSheetList
+	for id, v := range allCasesMap {
+		if _, ok := autoCases[id]; !ok {
+			diff = append(diff, v)
+		}
+	}
+
+	sort.Sort(diff)
+
+	fmt.Println("sorted diff: ", diff)
+
+	//change to column
+	data := make([][]interface{}, len(diff))
+	for i := 0; i < len(diff); i++ {
+		data[i] = []interface{}{
+			diff[i].ID,
+			diff[i].Title,
+			diff[i].Platform,
+			diff[i].Type,
+			diff[i].Version,
+			//owner
+			"",
+			diff[i].Status,
+			diff[i].Comment,
+		}
+	}
+
+	//check target sheet exist or not
+	targetSheetName := "test"
+	targetReadRange := targetSheetName + "!A2:D1"
+	_, err = srv.Spreadsheets.Values.Get(spreadsheetId, targetReadRange).Do()
+	if err != nil {
+		log.Fatalf("Failed to read data from sheet: %v", err)
+	}
+
+	appendDataToSheet(srv, HOUserStorySheetID, targetReadRange, data)
 }

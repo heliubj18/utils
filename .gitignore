@@ -8,3 +8,5 @@
 bin
 tools/bin
 *.swp
+token.json
+*token*

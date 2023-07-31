@@ -118,6 +118,10 @@ switch-config-heli:
 
 .PHONY: build-google-automation
 build-google-automation:
-	mkdir -p "${OUT_DIR}"
+	@mkdir -p "${OUT_DIR}" ; \
 	export GO111MODULE="on" && export GOFLAGS="" && go build  -ldflags="-s -w" -o "${OUT_DIR}" "./google/automation"
 
+.PHONY: run-google-automation
+run-google-automation:
+	@$(MAKE) build-google-automation
+	GOOGLE_API_CREDENTIALS=$(HOME)/.google/credentials ./bin/automation
