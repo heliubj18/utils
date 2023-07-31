@@ -190,7 +190,7 @@ func main() {
 		for i := 0; i < len(resp.Values); i++ {
 			row := resp.Values[i]
 			if len(row) > 0 {
-				autoCases[strings.Trim(row[0].(string), " ")] = struct{}{}
+				autoCases[strings.TrimSpace(row[0].(string))] = struct{}{}
 			}
 		}
 	}
@@ -214,27 +214,25 @@ func main() {
 		for i := 0; i < len(resp.Values); i++ {
 			row := resp.Values[i]
 			if len(row) > 6 {
-				caseID := strings.Trim(row[6].(string), " ")
+				caseID := strings.TrimSpace(row[6].(string))
 				if strings.HasPrefix(caseID, "OCP-") {
-					record := AutoSheet{
-						Title:    row[1].(string),
-						Status:   "ToDo",
-						Platform: getPlatformByTitle(row[1].(string)),
-						Type:     getAutoTypeByTitle(row[1].(string)),
-					}
-
-					if v := strings.Split(row[2].(string), " "); len(v) > 0 {
-						record.Version = strings.Trim(strings.TrimSpace(v[len(v)-1]), ",")
-					}
-
-					jiraID := row[0].(string)
-					if jiraID != "" && strings.HasPrefix(jiraID, "OCPBUGS-") {
-						record.Comment = jiraID
-					}
-
 					ids := strings.FieldsFunc(caseID, separators)
 					for _, id := range ids {
-						record.ID = id
+						record := AutoSheet{
+							ID:       id,
+							Title:    row[1].(string),
+							Status:   "ToDo",
+							Platform: getPlatformByTitle(row[1].(string)),
+							Type:     getAutoTypeByTitle(row[1].(string)),
+						}
+						if v := strings.Split(row[2].(string), " "); len(v) > 0 {
+							record.Version = strings.Trim(strings.TrimSpace(v[len(v)-1]), ",")
+						}
+
+						jiraID := strings.TrimSpace(row[0].(string))
+						if jiraID != "" && strings.HasPrefix(jiraID, "OCPBUGS-") {
+							record.Comment = fmt.Sprintf(`=HYPERLINK("https://issues.redhat.com/browse/%s","%s")`, jiraID, jiraID)
+						}
 						allCasesMap[id] = record
 					}
 				}
