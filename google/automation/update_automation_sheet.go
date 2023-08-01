@@ -146,7 +146,6 @@ func getAutoTypeByTitle(title string) string {
 	}
 
 	return "Function"
-
 }
 
 func main() {
@@ -249,8 +248,11 @@ func main() {
 	}
 
 	sort.Sort(diff)
-
 	fmt.Println("sorted diff: ", diff)
+	if len(diff) < 1 {
+		fmt.Println("no diff found, ignore update automation sheet...")
+		return
+	}
 
 	//change to column
 	data := make([][]interface{}, len(diff))
