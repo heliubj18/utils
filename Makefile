@@ -82,6 +82,20 @@ delete-s3:
 clean-s3-all: $(HYPERSHIFT_CLEAN_S3_TOOL)
 	sh $(HYPERSHIFT_CLEAN_S3_TOOL)
 
+.PHONY: hypershift-destroy-infra-aws
+hypershift-destroy-infra-aws:
+	hypershift destroy infra $(PLATFORM) --infra-id $(INFRA_ID) --aws-creds $(AWS_CRENDENTIAL) --base-domain --base-domain $(AWS_BASE_DOMAIN) --region $(HYPERSHIFT_AWS_REGION)
+
+.PHONY: hypershift-destroy-iam-aws
+hypershift-destroy-iam-aws:
+	hypershift destroy iam $(PLATFORM) --infra-id $(INFRA_ID) --aws-creds $(AWS_CRENDENTIAL) --region $(HYPERSHIFT_AWS_REGION)
+
+.PHONY: hypershift-clear-infra
+hypershift-clear-infra:
+	@$(MAKE) hypershift-destroy-infra-aws
+	@$(MAKE) hypershift-destroy-iam-aws
+
+
 .PHONY: clean
 clean:
 	@$(MAKE) hypershift-destroy-aws
