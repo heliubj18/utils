@@ -1,5 +1,5 @@
 #!/bin/sh
-set -eo pipefail
+set -eox pipefail
 source $(dirname "$0")/pre_check.sh
 
 # shellcheck disable=SC2112
@@ -28,13 +28,10 @@ function build_hypershift_cli()
 {
   local branch="${BRANCH:-main}"
   pushd ${HYPERSHIFT_DIR}
-  local current_branch=$(git rev-parse --abbrev-ref HEAD)
+  #local current_branch=$(git rev-parse --abbrev-ref HEAD)
 
   git checkout ${branch}
-  if ! git diff --quiet HEAD origin/"${branch}"; then
-    git pull origin ${branch}
-  fi
-
+  git pull origin ${branch}
   git -P log -1
 
   echo
@@ -44,7 +41,7 @@ function build_hypershift_cli()
   hypershift -v
   echo
 
-  git checkout "$current_branch"
+  #git checkout "$current_branch"
   popd
 }
 

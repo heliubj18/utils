@@ -1,11 +1,12 @@
 #!/bin/sh
-set -ex
+set -e
 
 echo ">>>>>> check s3 bucket info"
 echo "bucket config: BUCKET_NAME: $BUCKET_NAME BUCKET_REGION $BUCKET_REGION"
 echo "bucket info in OCP: "
 oc -n kube-public get cm oidc-storage-provider-s3-config -ojsonpath='{.data}' | jq
-aws s3api head-bucket --bucket $BUCKET_NAME
+bucket_name=$(oc get cm -n kube-public oidc-storage-provider-s3-config  -ojsonpath='{.data.name}')
+aws s3api head-bucket --bucket $bucket_name
 echo
 
 echo ">>>>> hypershift version"

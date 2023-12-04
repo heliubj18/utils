@@ -1,5 +1,5 @@
 #!/bin/sh
-set -e
+set -ex
 
 source $(dirname "$0")/pre_check.sh
 
@@ -36,7 +36,7 @@ TAG_VALUE=${TAG_VALUE:-"owned"}
 echo "bucket name:" ${BUCKET_NAME} "region:" ${BUCKET_REGION}
 
 if [[ ${BUCKET_REGION} == "us-east-1" ]] ; then
-  aws s3api create-bucket --bucket ${BUCKET_REGION}
+  aws s3api create-bucket --region=${BUCKET_REGION} --bucket ${BUCKET_NAME}
 else
   aws s3api create-bucket  --create-bucket-configuration \
       LocationConstraint=${BUCKET_REGION} --region=${BUCKET_REGION} --bucket ${BUCKET_NAME}

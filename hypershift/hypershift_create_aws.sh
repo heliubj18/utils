@@ -7,14 +7,17 @@ AWS_CREDS=${AWS_CREDS:-"$HOME/.aws/credentials"}
 NODEPOOL_REPLICAS=${NODEPOOL_REPLICAS:-"2"}
 HYPERSHIFT_AWS_REGION=${HYPERSHIFT_AWS_REGION:-"us-east-2"}
 NAMESPACE=${NAMESPACE:-"clusters"}
-AWS_EXTERNAL_DNS_DOMAIN=${AWS_EXTERNAL_DNS_DOMAIN:-"hypershift-ext.qe.devcluster.openshift.com"}
-AWS_BASE_DOMAIN=${AWS_BASE_DOMAIN:-"hypershift-ci.qe.devcluster.openshift.com"}
+#AWS_EXTERNAL_DNS_DOMAIN=${AWS_EXTERNAL_DNS_DOMAIN:-"hypershift-ext.qe.devcluster.openshift.com"}
+AWS_BASE_DOMAIN=${AWS_BASE_DOMAIN:-"qe.devcluster.openshift.com"}
 
 if [ -z "${RELEASE_IMAGE}" ] && [ "${RELEASE_IMAGE_SYNC_MGMT}" == "true" ] ; then
   RELEASE_IMAGE=$(oc get clusterversion version -ojsonpath={.status.desired.image})
 fi
 
-create_cmd="hypershift create cluster aws \
+HYPERSHIFT_CLI=${HYPERSHIFT_CLI:-"hypershift"}
+
+#--control-plane-availability-policy=HighlyAvailable
+create_cmd="${HYPERSHIFT_CLI} create cluster aws \
 --name=${CLUSTER_NAME} \
 --pull-secret=${PULL_SSECRET} \
 --aws-creds=${AWS_CREDS} \
@@ -23,12 +26,17 @@ create_cmd="hypershift create cluster aws \
 --base-domain=${AWS_BASE_DOMAIN} \
 --annotations=hypershift.openshift.io/cleanup-cloud-resources=\"true\""
 
-if [[ -n ${NAMESPACE} ]] ; then
-  create_cmd=${create_cmd}" --namespace=${NAMESPACE}"
+
+
+if [[ -n ${HC_NAMESPACE} ]] ; then
+  create_cmd=${create_cmd}" --namespace=${HC_NAMESPACE}"
 fi
 
 if [[ -n ${ENDPOINT_ACCESS} ]] ; then
-  create_cmd=${create_cmd}" --endpoint-access=${ENDPOINT_ACCESS}"
+  create_cmd=${create_cmd}" --endpoint-access=${ENDPOINT_ACCESS} "
+  if [[ "${ENDPOINT_ACCESS}" == "Private" ]] ; then
+    create_cmd=${create_cmd}" --ssh-key=$HOME/.ssh/id_rsa.pub "
+  fi
 fi
 
 if [[ -n ${AWS_EXTERNAL_DNS_DOMAIN} ]] ; then

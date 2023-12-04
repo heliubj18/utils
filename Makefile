@@ -16,9 +16,17 @@ HYPERSHIFT_CLEAN_S3_TOOL := $(TOOL_DIR)/clean_s3.sh
 HYPERSHIFT_CREATE_HOSTED_KUBECONFIG_TOOL := $(TOOL_DIR)/create_hosted_kubeconfig.sh
 HYPERSHIFT_DEBUG_HC_TOOL := $(TOOL_DIR)/debug_hc.sh
 
+HYPERSHIFT_CLI ?= hypershift
+
+PLATFORM ?= aws
+
 .PHONY: test
 test:
 	sh $(TOOL_DIR)/test.sh
+
+.PHONY: check-hostedzones
+check-hostedzones:
+	sh $(TOOL_DIR)/check-hostedzones.sh
 
 .PHONY: create
 create:
@@ -37,6 +45,10 @@ ifeq ($(strip $(PR_NUMBER)),)
 endif
 	sh $(HYPERSHIFT_CLI_TOOL) pr
 
+.PHONY: create-bastion-aws
+create-bastion-aws:
+	sh $(TOOL_DIR)/create_bastion.sh
+
 .PHONY: create-s3
 create-s3: $(HYPERSHIFT_S3_TOOL)
 	sh $(HYPERSHIFT_S3_TOOL) $(BUCKET_NAME)
@@ -54,7 +66,7 @@ hypershift-create-aws: $(HYPERSHIFT_CREATE_AWS_TOOL)
 hypershift-create-hosted-kubeconfig: $(HYPERSHIFT_CREATE_HOSTED_KUBECONFIG_TOOL)
 	sh $(HYPERSHIFT_CREATE_HOSTED_KUBECONFIG_TOOL)
 
-.PHONY: hypeshift-debug
+.PHONY: hypershift-debug
 hypershift-debug: $(HYPERSHIFT_DEBUG_HC_TOOL)
 	sh $(HYPERSHIFT_DEBUG_HC_TOOL)
 
@@ -64,9 +76,9 @@ hypershift-uninstall:
 
 .PHONY: hypershift-destroy-aws
 hypershift-destroy-aws:
-	@target_hc=`oc get hc -n $(NAMESPACE) $(CLUSTER_NAME) --ignore-not-found` ; \
+	target_hc=`oc get hc -n $(HC_NAMESPACE) $(CLUSTER_NAME) --ignore-not-found` ; \
 	if [ -n "$$target_hc" ] ; then \
-		hypershift destroy cluster aws \
+		${HYPERSHIFT_CLI} destroy cluster aws \
 		  --aws-creds $(AWS_CREDS) \
 		  --name $(CLUSTER_NAME) \
 		  --region $(HYPERSHIFT_AWS_REGION) ; \
@@ -128,3 +140,7 @@ HELI_AWS_CONFIG := ./makefile_config/heli_aws.mk
 switch-config-heli:
 	@echo "$(HELI_AWS_CONFIG)" > $(CURRENT_CONFIG) ; \
 	echo "Switched to default config file $(HELI_AWS_CONFIG)"
+
+.PHONY: help
+help:
+	@grep .PHONY Makefile | grep -v help
