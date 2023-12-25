@@ -17,6 +17,10 @@ Switched to config file ./makefile_config/heli_aws.mk
 ```
 
 ### Example
+* help
+```shell
+make help
+```
 * create a hosted cluster automatically
 ```shell
 make create
@@ -35,19 +39,19 @@ make delete-s3
 ```
 * hypershift install
 ```shell
-make hypershift-install
+make ho-install
 ```
 * uninstall hypershift operator
 ```shell
-make hypershift-uninstall
+make ho-uninstall
 ```
 * hypershift create an aws hosted cluster
 ```shell
-make hypershift-create-aws
+make create-aws
 ```
 *  destroy an aws hosted cluster
 ```shell
-make hypershift-destroy-aws
+make destroy-aws
 ```
 * build the latest hypershift cli
 ```shell
