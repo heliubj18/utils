@@ -24,15 +24,15 @@ PLATFORM ?= aws
 test:
 	sh $(TOOL_DIR)/test.sh
 
-.PHONY: check-hostedzones
-check-hostedzones:
+.PHONY: check-hz
+check-hz:
 	sh $(TOOL_DIR)/check-hostedzones.sh
 
 .PHONY: create
 create:
 	@$(MAKE) create-s3
-	@$(MAKE) hypershift-install
-	@$(MAKE) hypershift-create-aws
+	@$(MAKE) ho-install
+	@$(MAKE) create-aws
 
 .PHONY: build-cli
 build-cli: $(HYPERSHIFT_CLI_TOOL)
@@ -45,37 +45,37 @@ ifeq ($(strip $(PR_NUMBER)),)
 endif
 	sh $(HYPERSHIFT_CLI_TOOL) pr
 
-.PHONY: create-bastion-aws
-create-bastion-aws:
+.PHONY: create-aws-bastion
+create-aws-bastion:
 	sh $(TOOL_DIR)/create_bastion.sh
 
 .PHONY: create-s3
 create-s3: $(HYPERSHIFT_S3_TOOL)
 	sh $(HYPERSHIFT_S3_TOOL) $(BUCKET_NAME)
 
-.PHONY: hypershift-install
-hypershift-install: $(HYPERSHIFT_INSTALL_TOOL)
+.PHONY: ho-install
+ho-install: $(HYPERSHIFT_INSTALL_TOOL)
 	sh $(HYPERSHIFT_INSTALL_TOOL)
 
-.PHONY: hypershift-create-aws
-hypershift-create-aws: $(HYPERSHIFT_CREATE_AWS_TOOL)
+.PHONY: create-aws
+create-aws: $(HYPERSHIFT_CREATE_AWS_TOOL)
 	@echo RELEASE_IMAGE_SYNC_MGMT $(RELEASE_IMAGE_SYNC_MGMT) ; \
 	sh $(HYPERSHIFT_CREATE_AWS_TOOL)
 
-.PHONY: hypershift-create-hosted-kubeconfig
-hypershift-create-hosted-kubeconfig: $(HYPERSHIFT_CREATE_HOSTED_KUBECONFIG_TOOL)
+.PHONY: create-kubeconfig
+create-kubeconfig: $(HYPERSHIFT_CREATE_HOSTED_KUBECONFIG_TOOL)
 	sh $(HYPERSHIFT_CREATE_HOSTED_KUBECONFIG_TOOL)
 
-.PHONY: hypershift-debug
-hypershift-debug: $(HYPERSHIFT_DEBUG_HC_TOOL)
+.PHONY: debug
+debug: $(HYPERSHIFT_DEBUG_HC_TOOL)
 	sh $(HYPERSHIFT_DEBUG_HC_TOOL)
 
-.PHONY: hypershift-uninstall
-hypershift-uninstall:
+.PHONY: ho-uninstall
+ho-uninstall:
 	hypershift install  render --format=yaml | oc delete -f -
 
-.PHONY: hypershift-destroy-aws
-hypershift-destroy-aws:
+.PHONY: destroy-aws
+destroy-aws:
 	target_hc=`oc get hc -n $(HC_NAMESPACE) $(CLUSTER_NAME) --ignore-not-found` ; \
 	if [ -n "$$target_hc" ] ; then \
 		${HYPERSHIFT_CLI} destroy cluster aws \
@@ -94,16 +94,16 @@ delete-s3:
 clean-s3-all: $(HYPERSHIFT_CLEAN_S3_TOOL)
 	sh $(HYPERSHIFT_CLEAN_S3_TOOL)
 
-.PHONY: hypershift-destroy-infra-aws
-hypershift-destroy-infra-aws:
+.PHONY: destroy-infra-aws
+destroy-infra-aws:
 	hypershift destroy infra $(PLATFORM) --infra-id $(INFRA_ID) --aws-creds $(AWS_CRENDENTIAL) --base-domain --base-domain $(AWS_BASE_DOMAIN) --region $(HYPERSHIFT_AWS_REGION)
 
-.PHONY: hypershift-destroy-iam-aws
-hypershift-destroy-iam-aws:
+.PHONY: destroy-iam-aws
+destroy-iam-aws:
 	hypershift destroy iam $(PLATFORM) --infra-id $(INFRA_ID) --aws-creds $(AWS_CRENDENTIAL) --region $(HYPERSHIFT_AWS_REGION)
 
-.PHONY: hypershift-clear-infra
-hypershift-clear-infra:
+.PHONY: clear-infra
+clear-infra:
 	@$(MAKE) hypershift-destroy-infra-aws
 	@$(MAKE) hypershift-destroy-iam-aws
 

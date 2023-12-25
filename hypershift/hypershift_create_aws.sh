@@ -7,7 +7,7 @@ AWS_CREDS=${AWS_CREDS:-"$HOME/.aws/credentials"}
 NODEPOOL_REPLICAS=${NODEPOOL_REPLICAS:-"2"}
 HYPERSHIFT_AWS_REGION=${HYPERSHIFT_AWS_REGION:-"us-east-2"}
 NAMESPACE=${NAMESPACE:-"clusters"}
-#AWS_EXTERNAL_DNS_DOMAIN=${AWS_EXTERNAL_DNS_DOMAIN:-"hypershift-ext.qe.devcluster.openshift.com"}
+AWS_EXTERNAL_DNS_DOMAIN=${AWS_EXTERNAL_DNS_DOMAIN:-"hypershift-ext.qe.devcluster.openshift.com"}
 AWS_BASE_DOMAIN=${AWS_BASE_DOMAIN:-"qe.devcluster.openshift.com"}
 
 if [ -z "${RELEASE_IMAGE}" ] && [ "${RELEASE_IMAGE_SYNC_MGMT}" == "true" ] ; then
@@ -32,15 +32,11 @@ if [[ -n ${HC_NAMESPACE} ]] ; then
   create_cmd=${create_cmd}" --namespace=${HC_NAMESPACE}"
 fi
 
-if [[ -n ${ENDPOINT_ACCESS} ]] ; then
-  create_cmd=${create_cmd}" --endpoint-access=${ENDPOINT_ACCESS} "
+if [[ ${ENDPOINT_ACCESS} == "PublicAndPrivate" ]] ||  [[ ${ENDPOINT_ACCESS} == "Private" ]] ; then
+  create_cmd=${create_cmd}" --endpoint-access=${ENDPOINT_ACCESS} --external-dns-domain=${AWS_EXTERNAL_DNS_DOMAIN}"
   if [[ "${ENDPOINT_ACCESS}" == "Private" ]] ; then
     create_cmd=${create_cmd}" --ssh-key=$HOME/.ssh/id_rsa.pub "
   fi
-fi
-
-if [[ -n ${AWS_EXTERNAL_DNS_DOMAIN} ]] ; then
-  create_cmd=${create_cmd}" --external-dns-domain=${AWS_EXTERNAL_DNS_DOMAIN}"
 fi
 
 if [[ -n ${INFRA_AVAILABILITY_POLICY} ]] ; then
@@ -63,5 +59,11 @@ if [[ -n ${IMAGE_CONTENT_SOURCES} ]] ; then
   create_cmd=${create_cmd}" --image-content-sources=${IMAGE_CONTENT_SOURCES}"
 fi
 
-set -x
-${create_cmd}
+if [[ -n ${RENDER} ]] ; then
+  create_cmd=${create_cmd}" --render"
+fi
+
+echo ${create_cmd}
+#set -x
+
+#${create_cmd}

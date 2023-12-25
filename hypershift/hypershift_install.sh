@@ -21,7 +21,10 @@ create_cmd="${HYPERSHIFT_CLI} install \
 --oidc-storage-provider-s3-credentials=${AWS_CRENDENTIAL} \
 --oidc-storage-provider-s3-bucket-name=${BUCKET_NAME} \
 --oidc-storage-provider-s3-region=${BUCKET_REGION} \
---enable-defaulting-webhook=true "
+--enable-defaulting-webhook=true \
+--enable-cvo-management-cluster-metrics-access \
+--platform-monitoring=All \
+"
 if [[ -n ${HO_NAMESPACE} ]] ; then
   create_cmd=${create_cmd}" --namespace=${HO_NAMESPACE}"
 fi
@@ -32,7 +35,8 @@ if [[ ${ENDPOINT_ACCESS} == "PublicAndPrivate" ]] ||  [[ ${ENDPOINT_ACCESS} == "
       --aws-private-region=${HYPERSHIFT_AWS_REGION} \
       --external-dns-provider=aws \
       --external-dns-credentials=${AWS_CRENDENTIAL} \
-      --external-dns-domain-filter=${AWS_EXTERNAL_DNS_DOMAIN} "
+      --external-dns-domain-filter=${AWS_EXTERNAL_DNS_DOMAIN} \
+      --enable-cvo-management-cluster-metrics-access "
 fi
 
 set -x
