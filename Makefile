@@ -20,6 +20,11 @@ HYPERSHIFT_CLI ?= hypershift
 
 PLATFORM ?= aws
 
+.PHONY: help
+help:
+	@echo "make options:"
+	@grep .PHONY Makefile | grep -v help | cut -d":" -f2
+
 .PHONY: test
 test:
 	sh $(TOOL_DIR)/test.sh
@@ -140,7 +145,3 @@ HELI_AWS_CONFIG := ./makefile_config/heli_aws.mk
 switch-config-heli:
 	@echo "$(HELI_AWS_CONFIG)" > $(CURRENT_CONFIG) ; \
 	echo "Switched to default config file $(HELI_AWS_CONFIG)"
-
-.PHONY: help
-help:
-	@grep .PHONY Makefile | grep -v help

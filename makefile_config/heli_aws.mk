@@ -35,11 +35,11 @@ AWS_EXTERNAL_DNS_DOMAIN := hypershift-ext.qe.devcluster.openshift.com
 AWS_BASE_DOMAIN := hypershift-ci.qe.devcluster.openshift.com
 # AWS_BASE_DOMAIN := qe.devcluster.openshift.com
 
-# RELEASE_IMAGE := registry.build05.ci.openshift.org/ci-ln-0f9624k/release:latest
+ RELEASE_IMAGE := registry.build05.ci.openshift.org/ci-ln-32xw52k/release:latest
 
 # if RELEASE_IMAGE is not set, and RELEASE_IMAGE_SYNC_MGMT == true,
 # the hosted cluster payload will set with mgmt image
-RELEASE_IMAGE_SYNC_MGMT := true
+# RELEASE_IMAGE_SYNC_MGMT := true
 
 
 # RELEASE_IMAGE := registry.ci.openshift.org/ocp/release:4.14.0-0.nightly-2023-07-18-085740
@@ -47,5 +47,5 @@ RELEASE_IMAGE_SYNC_MGMT := true
 #ZONES := us-east-2a,us-east-2b,us-east-2c
 # HYPERSHIFT_ARCH := arm64
 NODEPOOL_REPLICAS := 2
-RENDER := true
+# RENDER := true
 # IMAGE_CONTENT_SOURCES := ./makefile_config/icsp.yaml

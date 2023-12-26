@@ -64,6 +64,6 @@ if [[ -n ${RENDER} ]] ; then
 fi
 
 echo ${create_cmd}
-#set -x
+set -x
 
-#${create_cmd}
+${create_cmd}
