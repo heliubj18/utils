@@ -86,7 +86,8 @@ destroy-aws:
 		${HYPERSHIFT_CLI} destroy cluster aws \
 		  --aws-creds $(AWS_CREDS) \
 		  --name $(CLUSTER_NAME) \
-		  --region $(HYPERSHIFT_AWS_REGION) ; \
+		  --region $(HYPERSHIFT_AWS_REGION) \
+		  --namespace $(HC_NAMESPACE); \
 	else \
 	  echo "hc not found, destroy successfully" ; \
 	fi

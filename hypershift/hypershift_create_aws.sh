@@ -43,6 +43,11 @@ if [[ -n ${INFRA_AVAILABILITY_POLICY} ]] ; then
   create_cmd=${create_cmd}" --infra-availability-policy=${INFRA_AVAILABILITY_POLICY}"
 fi
 
+if [[ -n ${CP_AVAILABILITY_POLICY} ]] ; then
+  create_cmd=${create_cmd}" --control-plane-availability-policy=${CP_AVAILABILITY_POLICY}"
+fi
+
+
 if [[ -n ${ZONES} ]] ; then
   create_cmd=${create_cmd}" --zones=${ZONES} "
 fi
@@ -60,10 +65,9 @@ if [[ -n ${IMAGE_CONTENT_SOURCES} ]] ; then
 fi
 
 if [[ -n ${RENDER} ]] ; then
-  create_cmd=${create_cmd}" --render"
+  create_cmd=${create_cmd}" --render > hostedcluster.yaml"
 fi
 
-echo ${create_cmd}
 set -x
 
 ${create_cmd}

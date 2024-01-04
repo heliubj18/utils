@@ -44,6 +44,7 @@ RELEASE_IMAGE_SYNC_MGMT := true
 
 # RELEASE_IMAGE := registry.ci.openshift.org/ocp/release:4.14.0-0.nightly-2023-07-18-085740
 #INFRA_AVAILABILITY_POLICY := HighlyAvailable
+#CP_AVAILABILITY_POLICY := HighlyAvailable
 #ZONES := us-east-2a,us-east-2b,us-east-2c
 # HYPERSHIFT_ARCH := arm64
 NODEPOOL_REPLICAS := 2
