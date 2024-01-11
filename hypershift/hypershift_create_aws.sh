@@ -32,7 +32,7 @@ if [[ -n ${HC_NAMESPACE} ]] ; then
   create_cmd=${create_cmd}" --namespace=${HC_NAMESPACE}"
 fi
 
-if [[ ${ENDPOINT_ACCESS} == "PublicAndPrivate" ]] ||  [[ ${ENDPOINT_ACCESS} == "Private" ]] ; then
+if [[ "${ENDPOINT_ACCESS}" == "PublicAndPrivate" ]] ||  [[ "${ENDPOINT_ACCESS}" == "Private" ]] ; then
   create_cmd=${create_cmd}" --endpoint-access=${ENDPOINT_ACCESS} --external-dns-domain=${AWS_EXTERNAL_DNS_DOMAIN}"
   if [[ "${ENDPOINT_ACCESS}" == "Private" ]] ; then
     create_cmd=${create_cmd}" --ssh-key=$HOME/.ssh/id_rsa.pub "

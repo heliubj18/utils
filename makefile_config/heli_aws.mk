@@ -22,7 +22,7 @@ AWS_PRIVATE_CREDS := $(HOME)/.aws/aws-private-creds
 # HO_NAMESPACE := hypershift
 
 # hypershift create
-CLUSTER_NAME := heli-test
+CLUSTER_NAME := heli-test-02
 
 PULL_SSECRET := $(HOME)/pull-secret
 AWS_CREDS :=$(HOME)/.aws/credentials
@@ -30,11 +30,11 @@ HYPERSHIFT_AWS_REGION := us-east-2
 HC_NAMESPACE := clusters
 SSH_KEY := $(HOME)/.ssh/id_rsa.pub
 
-ENDPOINT_ACCESS := Public
+ENDPOINT_ACCESS := PublicAndPrivate
 # enable AWS_EXTERNAL_DNS_DOMAIN and AWS_BASE_DOMAIN for publicAndPrivate or Private ENDPOINT_ACCESS
 AWS_EXTERNAL_DNS_DOMAIN := hypershift-ext.qe.devcluster.openshift.com
-# AWS_BASE_DOMAIN := hypershift-ci.qe.devcluster.openshift.com
- AWS_BASE_DOMAIN := qe.devcluster.openshift.com
+AWS_BASE_DOMAIN := hypershift-ci.qe.devcluster.openshift.com
+# AWS_BASE_DOMAIN := qe.devcluster.openshift.com
 
 # RELEASE_IMAGE := registry.build05.ci.openshift.org/ci-ln-32xw52k/release:latest
 
