@@ -11,13 +11,14 @@ BUCKET_REGION=$(aws s3api get-bucket-location --bucket $BUCKET_NAME --output tex
 #  BUCKET_REGION="us-east-1"
 #fi
 
-OPERATOR_IMAGE=${OPERATOR_IMAGE:-"quay.io/hypershift/hypershift-operator:latest"}
-
-if [[ $OCP_ARCH == "arm64" ]]; then
+if [[ $OCP_ARCH == "arm64" ]] && [[ "X$OPERATOR_IMAGE" == "X" ]] ; then
   OPERATOR_IMAGE="quay.io/hypershift/hypershift-operator:latest-arm64"
 fi
 
+OPERATOR_IMAGE=${OPERATOR_IMAGE:-"quay.io/hypershift/hypershift-operator:latest"}
+
 create_cmd="${HYPERSHIFT_CLI} install \
+--hypershift-image=${OPERATOR_IMAGE}  \
 --oidc-storage-provider-s3-credentials=${AWS_CRENDENTIAL} \
 --oidc-storage-provider-s3-bucket-name=${BUCKET_NAME} \
 --oidc-storage-provider-s3-region=${BUCKET_REGION} \
@@ -25,11 +26,12 @@ create_cmd="${HYPERSHIFT_CLI} install \
 --enable-cvo-management-cluster-metrics-access \
 --platform-monitoring=All \
 "
+# --enable-validating-webhook=true \
 if [[ -n ${HO_NAMESPACE} ]] ; then
   create_cmd=${create_cmd}" --namespace=${HO_NAMESPACE}"
 fi
 
-if [[ ${ENDPOINT_ACCESS} == "PublicAndPrivate" ]] ||  [[ ${ENDPOINT_ACCESS} == "Private" ]] ; then
+if [[ "${ENDPOINT_ACCESS}" == "PublicAndPrivate" ]] ||  [[ "${ENDPOINT_ACCESS}" == "Private" ]] ; then
   create_cmd=${create_cmd}" --private-platform AWS \
       --aws-private-creds ${AWS_PRIVATE_CREDS}  \
       --aws-private-region=${HYPERSHIFT_AWS_REGION} \

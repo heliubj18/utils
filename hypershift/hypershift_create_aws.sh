@@ -64,10 +64,19 @@ if [[ -n ${IMAGE_CONTENT_SOURCES} ]] ; then
   create_cmd=${create_cmd}" --image-content-sources=${IMAGE_CONTENT_SOURCES}"
 fi
 
-if [[ -n ${RENDER} ]] ; then
-  create_cmd=${create_cmd}" --render > hostedcluster.yaml"
+#if [[ -n ${RENDER} ]] ; then
+#  create_cmd=${create_cmd}" --render > hostedcluster.yaml"
+#fi
+
+if [[ -n ${NETWORK_TYPE} ]] ; then
+  create_cmd=${create_cmd}" --network-type=${NETWORK_TYPE}"
 fi
 
 set -x
+if [[ -n ${RENDER} ]] ; then
+  create_cmd=${create_cmd}" --render"
+  ${create_cmd} > hostedcluster.yaml
+else
+  ${create_cmd}
+fi
 
-${create_cmd}

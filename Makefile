@@ -15,6 +15,7 @@ HYPERSHIFT_CREATE_AWS_TOOL := $(TOOL_DIR)/hypershift_create_aws.sh
 HYPERSHIFT_CLEAN_S3_TOOL := $(TOOL_DIR)/clean_s3.sh
 HYPERSHIFT_CREATE_HOSTED_KUBECONFIG_TOOL := $(TOOL_DIR)/create_hosted_kubeconfig.sh
 HYPERSHIFT_DEBUG_HC_TOOL := $(TOOL_DIR)/debug_hc.sh
+HYPERSHIFT_CREATE_AWS_NODEPOOL_TOOL := $(TOOL_DIR)/create_np_aws.sh
 
 HYPERSHIFT_CLI ?= hypershift
 
@@ -67,8 +68,12 @@ create-aws: $(HYPERSHIFT_CREATE_AWS_TOOL)
 	@echo RELEASE_IMAGE_SYNC_MGMT $(RELEASE_IMAGE_SYNC_MGMT) ; \
 	sh $(HYPERSHIFT_CREATE_AWS_TOOL)
 
-.PHONY: create-kubeconfig
-create-kubeconfig: $(HYPERSHIFT_CREATE_HOSTED_KUBECONFIG_TOOL)
+.PHONY: create-np-aws
+create-np-aws: $(HYPERSHIFT_CREATE_AWS_NODEPOOL_TOOL)
+	sh $(HYPERSHIFT_CREATE_AWS_NODEPOOL_TOOL)
+
+.PHONY: kubeconfig
+kubeconfig: $(HYPERSHIFT_CREATE_HOSTED_KUBECONFIG_TOOL)
 	sh $(HYPERSHIFT_CREATE_HOSTED_KUBECONFIG_TOOL)
 
 .PHONY: debug
@@ -110,14 +115,14 @@ destroy-iam-aws:
 
 .PHONY: clear-infra
 clear-infra:
-	@$(MAKE) hypershift-destroy-infra-aws
-	@$(MAKE) hypershift-destroy-iam-aws
+	@$(MAKE) destroy-infra-aws
+	@$(MAKE) destroy-iam-aws
 
 
 .PHONY: clean
 clean:
-	@$(MAKE) hypershift-destroy-aws
-	@$(MAKE) hypershift-uninstall
+	@$(MAKE) destroy-aws
+	@$(MAKE) ho-uninstall
 	@$(MAKE) delete-s3
 
 .PHONY: switch-config
