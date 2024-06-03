@@ -11,21 +11,25 @@ BUCKET_REGION=$(aws s3api get-bucket-location --bucket $BUCKET_NAME --output tex
 #  BUCKET_REGION="us-east-1"
 #fi
 
-if [[ $OCP_ARCH == "arm64" ]] && [[ "X$OPERATOR_IMAGE" == "X" ]] ; then
+if [[ "$OCP_ARCH" == "arm64" ]] && [[ "X$OPERATOR_IMAGE" == "X" ]] ; then
   OPERATOR_IMAGE="quay.io/hypershift/hypershift-operator:latest-arm64"
 fi
 
 OPERATOR_IMAGE=${OPERATOR_IMAGE:-"quay.io/hypershift/hypershift-operator:latest"}
 
 create_cmd="${HYPERSHIFT_CLI} install \
---hypershift-image=${OPERATOR_IMAGE}  \
+--hypershift-image ${OPERATOR_IMAGE} \
 --oidc-storage-provider-s3-credentials=${AWS_CRENDENTIAL} \
 --oidc-storage-provider-s3-bucket-name=${BUCKET_NAME} \
 --oidc-storage-provider-s3-region=${BUCKET_REGION} \
 --enable-defaulting-webhook=true \
---enable-cvo-management-cluster-metrics-access \
 --platform-monitoring=All \
 "
+
+if [[ "${ENABLE_WEBHOOK}" == "true" ]] ; then
+  create_cmd=${create_cmd}" --enable-defaulting-webhook=true "
+fi
+
 # --enable-validating-webhook=true \
 if [[ -n ${HO_NAMESPACE} ]] ; then
   create_cmd=${create_cmd}" --namespace=${HO_NAMESPACE}"

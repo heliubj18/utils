@@ -66,7 +66,7 @@ function build_hypershift_cli_with_PR()
   echo
   hypershift -v
   echo
-  git checkout "$current_branch"
+  #git checkout "$current_branch"
   popd
 }
 

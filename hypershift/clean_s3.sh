@@ -14,5 +14,5 @@ for bucket in $buckets; do
         echo "Deleting object: s3://$bucket/$object"
         aws s3 rm "s3://$bucket/$object"
     done
-    #aws s3api delete-bucket --bucket "$bucket"
+    aws s3api delete-bucket --bucket "$bucket"
 done

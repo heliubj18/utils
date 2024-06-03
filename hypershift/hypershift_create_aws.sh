@@ -24,9 +24,12 @@ create_cmd="${HYPERSHIFT_CLI} create cluster aws \
 --node-pool-replicas=${NODEPOOL_REPLICAS} \
 --region=${HYPERSHIFT_AWS_REGION} \
 --base-domain=${AWS_BASE_DOMAIN} \
---annotations=hypershift.openshift.io/cleanup-cloud-resources=\"true\""
+--annotations=hypershift.openshift.io/cleanup-cloud-resources=\"true\" \
+--ssh-key=${HOME}/.ssh/id_rsa.pub "
 
-
+if [[ -n "${CONTROL_PLANE_OPERATOR}" ]] ; then
+   create_cmd=${create_cmd}" --control-plane-operator-image=${CONTROL_PLANE_OPERATOR}"
+fi
 
 if [[ -n ${HC_NAMESPACE} ]] ; then
   create_cmd=${create_cmd}" --namespace=${HC_NAMESPACE}"
@@ -62,6 +65,10 @@ fi
 
 if [[ -n ${IMAGE_CONTENT_SOURCES} ]] ; then
   create_cmd=${create_cmd}" --image-content-sources=${IMAGE_CONTENT_SOURCES}"
+fi
+
+if [[ "${ENABLE_FIPS}" == "true" ]] ; then
+  create_cmd=${create_cmd}" --fips"
 fi
 
 #if [[ -n ${RENDER} ]] ; then

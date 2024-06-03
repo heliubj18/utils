@@ -1,5 +1,5 @@
 #!/bin/sh
-set -e
+set -ex
 
 NAMESPACE=${NAMESPACE:-"clusters"}
 HYPERSHIFT_CLI=${HYPERSHIFT_CLI:-"hypershift"}
@@ -9,11 +9,15 @@ create_cmd="${HYPERSHIFT_CLI} create nodepool aws \
 --cluster-name=${CLUSTER_NAME} \
 --node-count=${NODE_COUNT} "
 
-if [[ -n ${RELEASE_IMAGE} ]] ; then
-  create_cmd=${create_cmd}" --release-image=${RELEASE_IMAGE}"
+#if [[ -n "${RELEASE_IMAGE}" ]] ; then
+#  create_cmd=${create_cmd}" --release-image=${RELEASE_IMAGE}"
+#fi
+
+if [[ -n "${NODEPOOL_RELEASE_IMAGE}" ]] ; then
+  create_cmd=${create_cmd}" --release-image=${NODEPOOL_RELEASE_IMAGE}"
 fi
 
-if [[ -n ${HC_NAMESPACE} ]] ; then
+if [[ -n "${HC_NAMESPACE}" ]] ; then
   create_cmd=${create_cmd}" --namespace=${HC_NAMESPACE}"
 fi
 
