@@ -1,0 +1,16 @@
+apiVersion: v1
+metadata:
+  name: idms-cm
+data:
+  config: |
+    apiVersion: config.openshift.io/v1
+    kind: ImageDigestMirrorSet
+    metadata:
+      name: valid-idms
+    spec:
+      imageDigestMirrors:
+        - mirrorSourcePolicy: AllowContactingSource
+          mirrors:
+            - brew.registry.redhat.io
+          source: registry.redhat.io
+kind: ConfigMap

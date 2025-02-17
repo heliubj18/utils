@@ -1,0 +1,29 @@
+apiVersion: hypershift.openshift.io/v1beta1
+kind: NodePool
+metadata:
+  creationTimestamp: null
+  name: heli-test
+  namespace: clusters
+spec:
+  config:
+    - name: idms-cm
+  arch: amd64
+  clusterName: heli-test
+  management:
+    autoRepair: false
+    upgradeType: Replace
+  platform:
+    aws:
+      instanceProfile: heli-test-rvq6p-worker
+      instanceType: m5.large
+      rootVolume:
+        size: 120
+        type: gp3
+      subnet:
+        id: subnet-0d44c6750a9c2583c
+    type: AWS
+  release:
+    image: registry.ci.openshift.org/ocp/release@sha256:5fa08cfafb0c73c17c859facb5d91a008588ef6ab49303fbad2bfdd096fd3bf8
+  replicas: 1
+status:
+  replicas: 0

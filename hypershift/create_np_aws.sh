@@ -36,7 +36,7 @@ fi
 set -x
 if [[ -n ${RENDER} ]] ; then
   create_cmd=${create_cmd}" --render"
-  ${create_cmd} > hostedcluster.yaml
+  ${create_cmd} > nodepool.yaml
 else
   ${create_cmd}
 fi

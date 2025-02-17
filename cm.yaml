@@ -1,0 +1,7 @@
+apiVersion: machineconfiguration.openshift.io/v1
+kind: KubeletConfig
+metadata:
+  name: set-pid-limit-kubelet-two
+spec:
+  kubeletConfig:
+    podPidsLimit: 16384 

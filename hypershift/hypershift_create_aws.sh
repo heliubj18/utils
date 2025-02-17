@@ -59,6 +59,10 @@ if [[ -n ${HYPERSHIFT_ARCH} ]] ; then
   create_cmd=${create_cmd}" --arch=${HYPERSHIFT_ARCH}"
 fi
 
+if [[ -n ${HYPERSHIFT_MULTI_ARCH} ]] ; then
+  create_cmd=${create_cmd}" --multi-arch=${HYPERSHIFT_MULTI_ARCH}"
+fi
+
 if [[ -n ${RELEASE_IMAGE} ]] ; then
   create_cmd=${create_cmd}" --release-image=${RELEASE_IMAGE}"
 fi
@@ -71,6 +75,10 @@ if [[ "${ENABLE_FIPS}" == "true" ]] ; then
   create_cmd=${create_cmd}" --fips"
 fi
 
+if [[ "${DEDICATED}" == "true" ]] ; then
+  create_cmd=${create_cmd}" --annotations hypershift.openshift.io/topology=dedicated-request-serving-components"
+fi
+
 #if [[ -n ${RENDER} ]] ; then
 #  create_cmd=${create_cmd}" --render > hostedcluster.yaml"
 #fi
@@ -79,9 +87,25 @@ if [[ -n ${NETWORK_TYPE} ]] ; then
   create_cmd=${create_cmd}" --network-type=${NETWORK_TYPE}"
 fi
 
+if [[ -n ${VPC_CIDR} ]] ; then
+  create_cmd=${create_cmd}" --vpc-cidr=${VPC_CIDR}"
+fi
+
+if [[ -n ${TOLERATION} ]] ; then
+  create_cmd=${create_cmd}" --toleration=${TOLERATION}"
+fi
+
+if [[ -n ${LABELS} ]] ; then
+  create_cmd=${create_cmd}" --labels=${LABELS}"
+fi
+
+if [[ -n ${PODS_LABELS} ]] ; then
+  create_cmd=${create_cmd}" --pods-labels=${PODS_LABELS}"
+fi
+
 set -x
 if [[ -n ${RENDER} ]] ; then
-  create_cmd=${create_cmd}" --render"
+  create_cmd=${create_cmd}" --render --render-sensitive "
   ${create_cmd} > hostedcluster.yaml
 else
   ${create_cmd}
