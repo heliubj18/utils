@@ -3,7 +3,7 @@ BUCKET_NAME := heli-test
 BUCKET_REGION := us-east-2
 
 #
-INFRA_ID=heli-test-02-62gdr
+INFRA_ID=heli-test-hh5rp
 HYPERSHIFT_CLI=hypershift
 
 # resource tags
@@ -28,7 +28,7 @@ CLUSTER_NAME := heli-test
 
 PULL_SSECRET := $(HOME)/pull-secret
 AWS_CREDS :=$(HOME)/.aws/credentials
-HYPERSHIFT_AWS_REGION := ap-southeast-5
+HYPERSHIFT_AWS_REGION := us-east-2
 HC_NAMESPACE := clusters
 SSH_KEY := $(HOME)/.ssh/id_rsa.pub
 HO_TECH_PREVIEW_NO_UPGRADE := true
@@ -40,7 +40,7 @@ ENDPOINT_ACCESS := Public
 # AWS_BASE_DOMAIN := hypershift-ci.qe.devcluster.openshift.com
  AWS_BASE_DOMAIN := qe.devcluster.openshift.com
 
- RELEASE_IMAGE := registry.ci.openshift.org/ocp/release:4.19.0-0.nightly-2025-01-19-211100
+# RELEASE_IMAGE := registry.ci.openshift.org/ocp/release:4.19.0-0.nightly-2025-02-23-235415
 #  RELEASE_IMAGE := registry.ci.openshift.org/ocp/release:4.16.0-0.nightly-2024-12-05-111103
 
  # RELEASE_IMAGE := registry.ci.openshift.org/ocp/release@sha256:d2b7f211a67245f52e76d40aade72a53007c2e8b40872bb88a68d87e6cea75ae
@@ -60,7 +60,8 @@ ENDPOINT_ACCESS := Public
 # HYPERSHIFT_MULTI_ARCH := true
 # TOLERATION := key=heli-test,operator=Exists,effect=NoSchedule
  NODEPOOL_REPLICAS := 1
-# RENDER := true
+ RENDER := true
+ ENABLE_PROXY := true
 # IMAGE_CONTENT_SOURCES := ./makefile_config/icsp.yaml
 # LABELS := heli-test=owned
  PODS_LABELS := heli-test-v1=owned,heli-test-v2=owned

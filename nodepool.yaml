@@ -5,25 +5,27 @@ metadata:
   name: heli-test
   namespace: clusters
 spec:
-  config:
-    - name: idms-cm
   arch: amd64
   clusterName: heli-test
   management:
     autoRepair: false
     upgradeType: Replace
   platform:
-    aws:
-      instanceProfile: heli-test-b5725-worker
-      instanceType: m5.large
-      rootVolume:
-        size: 120
-        type: gp3
-      subnet:
-        id: subnet-0a01184806e5d69b4
-    type: AWS
+    azure:
+      diagnostics:
+        storageAccountType: Managed
+      encryptionAtHost: Enabled
+      image:
+        imageID: /subscriptions/53b8f551-f0fc-4bea-8cba-6d1fefd54c8a/resourceGroups/ci-op-li75lz3r-eeed2-rg/providers/Microsoft.Compute/images/rhcos.x86_64.vhd
+        type: ImageID
+      osDisk:
+        diskStorageAccountType: Premium_LRS
+        sizeGiB: 120
+      subnetID: /subscriptions/53b8f551-f0fc-4bea-8cba-6d1fefd54c8a/resourceGroups/ci-op-li75lz3r-eeed2-vnet-rg/providers/Microsoft.Network/virtualNetworks/ci-op-li75lz3r-eeed2-vnet/subnets/ci-op-li75lz3r-eeed2-subnet
+      vmSize: Standard_D4s_v3
+    type: Azure
   release:
-    image: registry.ci.openshift.org/ocp/release:4.18.0-0.nightly-2025-01-15-030107
+    image: registry.ci.openshift.org/ocp/release:4.19.0-0.nightly-2025-02-23-235415
   replicas: 1
 status:
   replicas: 0

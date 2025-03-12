@@ -55,6 +55,10 @@ if [[ -n ${ZONES} ]] ; then
   create_cmd=${create_cmd}" --zones=${ZONES} "
 fi
 
+if [[ -n ${ENABLE_PROXY} ]] ; then
+  create_cmd=${create_cmd}" --enable-proxy "
+fi
+
 if [[ -n ${HYPERSHIFT_ARCH} ]] ; then
   create_cmd=${create_cmd}" --arch=${HYPERSHIFT_ARCH}"
 fi
