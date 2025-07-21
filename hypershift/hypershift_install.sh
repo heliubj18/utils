@@ -17,6 +17,8 @@ create_cmd="${HYPERSHIFT_CLI} install \
 --oidc-storage-provider-s3-region=${BUCKET_REGION} \
 --enable-defaulting-webhook=true \
 --platform-monitoring=All \
+--monitoring-dashboards \
+--metrics-set=All \
 "
 
 if [[ "$OCP_ARCH" == "arm64" ]] && [[ "X$OPERATOR_IMAGE" == "X" ]] ; then

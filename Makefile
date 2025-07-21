@@ -84,6 +84,10 @@ debug: $(HYPERSHIFT_DEBUG_HC_TOOL)
 ho-uninstall:
 	hypershift install  render --format=yaml | oc delete -f -
 
+.PHONY: e2e
+e2e:
+	sh $(TOOL_DIR)/e2e_test.sh
+
 .PHONY: destroy-aws
 destroy-aws:
 	target_hc=`oc get hc -n $(HC_NAMESPACE) $(CLUSTER_NAME) --ignore-not-found` ; \

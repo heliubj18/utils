@@ -1,5 +1,5 @@
 #
-INFRA_ID=heli-test-02-62gdr
+INFRA_ID=heli-test-rl6n7
 HYPERSHIFT_CLI=hypershift
 
 # resource tags
