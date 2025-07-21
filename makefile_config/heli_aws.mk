@@ -29,6 +29,7 @@ CLUSTER_NAME := heli-test
 PULL_SSECRET := $(HOME)/pull-secret
 AWS_CREDS :=$(HOME)/.aws/credentials
 HYPERSHIFT_AWS_REGION := us-east-2
+ZONES := us-east-2a,us-east-2b,us-east-2c
 HC_NAMESPACE := clusters
 SSH_KEY := $(HOME)/.ssh/id_rsa.pub
 HO_TECH_PREVIEW_NO_UPGRADE := true
@@ -56,7 +57,7 @@ AWS_BASE_DOMAIN := qe.devcluster.openshift.com
 # VPC_CIDR = 10.1.0.0/16
 # INFRA_AVAILABILITY_POLICY := HighlyAvailable
 # CP_AVAILABILITY_POLICY := HighlyAvailable
- # ZONES := us-east-2a,us-east-2b,us-east-2c
+
  OLM_PLACEMENT := Guest
 # HYPERSHIFT_ARCH := arm64
 # HYPERSHIFT_MULTI_ARCH := true
