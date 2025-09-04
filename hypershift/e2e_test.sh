@@ -3,9 +3,12 @@
 
 #oc login https://apiserver:6443 --exec-plugin=oc-oidc --issuer-url=$ISSUER_URL --client-id=$CLIENT_ID --extra-scopes=email --callback-port=8080
 sh $(dirname "$0")/install_keycloak.sh
+
+export SHARED_DIR="/tmp"
+source ${SHARED_DIR}/runtime_env
 export TECH_PREVIEW_NO_UPGRADE=true
 # --e2e.aws-oidc-s3-bucket-name hypershift-ci-2-oidc
-source $(dirname "$0")/../.env
+# source $(dirname "$0")/../.env
 
 test-e2e -test.v -test.run TestExternalOIDCTechPreview \
   --e2e.aws-region ${HYPERSHIFT_AWS_REGION} \
