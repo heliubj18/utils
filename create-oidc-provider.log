@@ -1,0 +1,1 @@
+{"level":"info","ts":1753872499.87654,"msg":"Created OIDC provider","provider":"arn:aws:iam::301721915996:oidc-provider/heli-test-02.s3.us-east-2.amazonaws.com/e2e-oidc-provider-p9pl5"}

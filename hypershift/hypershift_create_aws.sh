@@ -25,9 +25,10 @@ create_cmd="${HYPERSHIFT_CLI} create cluster aws \
 --region=${HYPERSHIFT_AWS_REGION} \
 --base-domain=${AWS_BASE_DOMAIN} \
 --annotations=hypershift.openshift.io/cleanup-cloud-resources=\"true\" \
---disable-cluster-capabilities=Ingress,Console,ImageRegistry,openshift-samples,Insights \
---ssh-key=${HOME}/.ssh/id_rsa.pub
+--disable-cluster-capabilities=openshift-samples,Insights \
+--ssh-key=${HOME}/.ssh/id_rsa.pub \
 "
+#--disable-multi-network
 
 if [[ -n "${CONTROL_PLANE_OPERATOR}" ]] ; then
    create_cmd=${create_cmd}" --control-plane-operator-image=${CONTROL_PLANE_OPERATOR}"
@@ -55,6 +56,7 @@ fi
 if [[ -n ${OLM_PLACEMENT} ]] ; then
   create_cmd=${create_cmd}" --olm-catalog-placement=${OLM_PLACEMENT}"
 fi
+
 
 if [[ -n ${ZONES} ]] ; then
   create_cmd=${create_cmd}" --zones=${ZONES} "

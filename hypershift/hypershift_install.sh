@@ -19,6 +19,7 @@ create_cmd="${HYPERSHIFT_CLI} install \
 --platform-monitoring=All \
 --monitoring-dashboards \
 --metrics-set=All \
+--enable-cpo-overrides
 "
 
 if [[ "$OCP_ARCH" == "arm64" ]] && [[ "X$OPERATOR_IMAGE" == "X" ]] ; then
@@ -53,16 +54,3 @@ fi
 
 set -x
 $create_cmd
-
-#hypershift install --hypershift-image=${OPERATOR_IMAGE} \
-#--oidc-storage-provider-s3-credentials=${AWS_CRENDENTIAL} \
-#--oidc-storage-provider-s3-bucket-name=${BUCKET_NAME} \
-#--oidc-storage-provider-s3-region=${BUCKET_REGION} \
-#--enable-defaulting-webhook=true
-#--platform-monitoring=All \
-#--enable-ci-debug-output \
-#--aws-private-creds=${AWS_PRIVATE_CREDS} \
-#--aws-private-region=${HYPERSHIFT_AWS_REGION} \
-#--external-dns-provider=aws \
-#--external-dns-credentials=${AWS_CRENDENTIAL} \
-#--external-dns-domain-filter=${AWS_EXTERNAL_DNS_DOMAIN}
