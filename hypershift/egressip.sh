@@ -3,7 +3,7 @@
 och run hello-world   --image=nginx:alpine   --restart=Never   --port=80
 och label ns default org=qe
 och label pod hello-world color=pink
-och label no ip-10-0-13-126.ec2.internal k8s.ovn.org/egress-assignable=
+och label no ip-10-0-13-196.ec2.internal k8s.ovn.org/egress-assignable=
 och rsh hello-world curl www.google.com -I
 
 ##

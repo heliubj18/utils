@@ -1,0 +1,18 @@
+apiVersion: v1
+items:
+  - apiVersion: k8s.ovn.org/v1
+    kind: EgressIP
+    metadata:
+      annotations:
+        k8s.ovn.org/egressip-mark: "50001"
+      name: egressip-heli
+    spec:
+      egressIPs:
+        - 10.0.13.197
+      namespaceSelector:
+        matchLabels:
+          org: qe
+      podSelector:
+        matchLabels:
+          color: pink
+kind: List
